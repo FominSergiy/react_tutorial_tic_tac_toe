@@ -11,12 +11,23 @@ const Square = (props) => {
 }
 
 
-const Board = () => {
-    const initStateArr = Array(9).fill(null);
+const Board = (props) => {
+    // // hooks
+    // const [squares, setSquares] = React.useState(Array(9).fill(null));
 
-    // hooks
-    const [squares, setSquares] = React.useState(initStateArr);
-    const [xIsNext, setNext] = React.useState(true);
+
+    const handleClick = (squares, setSquares, i, xIsNext, setNext) => {
+        squares = squares.slice();
+
+        // check if winner or if square is not null
+        if (calculateWinner(squares) || squares[i]) {
+            return
+        }
+
+        squares[i] = xIsNext ? 'X' : 'O';
+        setSquares(squares);
+        setNext(!xIsNext); // set the xIsNext to the opposite Bool value
+    }
 
 
     const renderSquare = (squares, setSquares, i, xIsNext, setNext) => {
@@ -30,56 +41,59 @@ const Board = () => {
         );
     }
 
-    const handleClick = (squares, setSquares, i, xIsNext, setNext) => {
-        squares = squares.slice();
-
-        // check if winner or square is not null
-        if (calculateWinner(squares) || squares[i]) {
-            return
-        }
-
-        squares[i] = xIsNext ? 'X' : 'O';
-        setSquares(squares);
-        setNext(!xIsNext); // set the xIsNext to the opposite Bool value
-    }
-
-
     //check for winner 
     const winner = calculateWinner(squares);
-    let status;
+    const status = checkForWinner(winner, props);
 
-    if (winner) {
-        status = `Winner:${winner}`;
-    } else {
-        status = `Next player: ${xIsNext ? 'X' : 'O'} `;
-    }
     return (
         <div>
             <div className="status">{status}</div>
             <div className="board-row">
-                {renderSquare(squares, setSquares, 0, xIsNext, setNext)}
-                {renderSquare(squares, setSquares, 1, xIsNext, setNext)}
-                {renderSquare(squares, setSquares, 2, xIsNext, setNext)}
+                {renderSquare(squares, setSquares, 0, props.xIsNext, props.setNext)}
+                {renderSquare(squares, setSquares, 1, props.xIsNext, props.setNext)}
+                {renderSquare(squares, setSquares, 2, props.xIsNext, props.setNext)}
             </div>
             <div className="board-row">
-                {renderSquare(squares, setSquares, 3, xIsNext, setNext)}
-                {renderSquare(squares, setSquares, 4, xIsNext, setNext)}
-                {renderSquare(squares, setSquares, 5, xIsNext, setNext)}
+                {renderSquare(squares, setSquares, 3, props.xIsNext, props.setNext)}
+                {renderSquare(squares, setSquares, 4, props.xIsNext, props.setNext)}
+                {renderSquare(squares, setSquares, 5, props.xIsNext, props.setNext)}
             </div>
             <div className="board-row">
-                {renderSquare(squares, setSquares, 6, xIsNext, setNext)}
-                {renderSquare(squares, setSquares, 7, xIsNext, setNext)}
-                {renderSquare(squares, setSquares, 8, xIsNext, setNext)}
+                {renderSquare(squares, setSquares, 6, props.xIsNext, props.setNext)}
+                {renderSquare(squares, setSquares, 7, props.xIsNext, props.setNext)}
+                {renderSquare(squares, setSquares, 8, props.xIsNext, props.setNext)}
             </div>
         </div>
     );
 }
 
 const Game = () => {
+    const [history, setHistory] = React.useState(Array(9).fill(null));
+    const [xIsNext, setNext] = React.useState(true);
+
+    // passing most recent
+    const current = history[history.length - 1];
+    const [squares, setSquares] = React.useState(current);
+
+    // pass hooks to Board eleme nt
+    const stateProps = {
+        history: history,
+        setHistory: setHistory,
+        xIsNext: xIsNext,
+        setNext: setNext,
+        squares: squares,
+        setSquares: setSquares
+    };
+
+
+    const winner = calculateWinner(current);
+    const gameStatus = checkForWinner(winner, stateProps);
+
+
     return (
         <div className="game">
             <div className="game-board">
-                <Board />
+                <Board {...stateProps} />
             </div>
             <div className="game-info">
                 <div>{/* status */}</div>
@@ -120,4 +134,16 @@ function calculateWinner(squares) {
         }
     }
     return null;
+}
+
+function checkForWinner(winner, props) {
+    let status;
+
+    if (winner) {
+        status = `Winner:${winner}`;
+    } else {
+        status = `Next player: ${props.xIsNext ? 'X' : 'O'} `;
+    }
+
+    return status;
 }
