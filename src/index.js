@@ -12,91 +12,89 @@ const Square = (props) => {
 
 
 const Board = (props) => {
-    // // hooks
-    // const [squares, setSquares] = React.useState(Array(9).fill(null));
 
-
-    const handleClick = (squares, setSquares, i, xIsNext, setNext) => {
-        squares = squares.slice();
-
-        // check if winner or if square is not null
-        if (calculateWinner(squares) || squares[i]) {
-            return
-        }
-
-        squares[i] = xIsNext ? 'X' : 'O';
-        setSquares(squares);
-        setNext(!xIsNext); // set the xIsNext to the opposite Bool value
-    }
-
-
-    const renderSquare = (squares, setSquares, i, xIsNext, setNext) => {
+    const renderSquare = (props, i) => {
         // where are all arguements stored
-        // after this dom element was generated? 
+        // after this dom element was generated?
         return (
             <Square
-                value={squares[i]}
-                onClick={() => handleClick(squares, setSquares, i, xIsNext, setNext)}
+                value={props.squares[i]}
+                onClick={() => props.onClick(props, i)} //! why I don't need to pass props here?
             />
         );
     }
 
-    //check for winner 
-    const winner = calculateWinner(squares);
-    const status = checkForWinner(winner, props);
-
     return (
         <div>
-            <div className="status">{status}</div>
             <div className="board-row">
-                {renderSquare(squares, setSquares, 0, props.xIsNext, props.setNext)}
-                {renderSquare(squares, setSquares, 1, props.xIsNext, props.setNext)}
-                {renderSquare(squares, setSquares, 2, props.xIsNext, props.setNext)}
+                {renderSquare(props, 0)}
+                {renderSquare(props, 1)}
+                {renderSquare(props, 2)}
             </div>
             <div className="board-row">
-                {renderSquare(squares, setSquares, 3, props.xIsNext, props.setNext)}
-                {renderSquare(squares, setSquares, 4, props.xIsNext, props.setNext)}
-                {renderSquare(squares, setSquares, 5, props.xIsNext, props.setNext)}
+                {renderSquare(props, 3)}
+                {renderSquare(props, 4)}
+                {renderSquare(props, 5)}
             </div>
             <div className="board-row">
-                {renderSquare(squares, setSquares, 6, props.xIsNext, props.setNext)}
-                {renderSquare(squares, setSquares, 7, props.xIsNext, props.setNext)}
-                {renderSquare(squares, setSquares, 8, props.xIsNext, props.setNext)}
+                {renderSquare(props, 6)}
+                {renderSquare(props, 7)}
+                {renderSquare(props, 8)}
             </div>
         </div>
     );
 }
 
 const Game = () => {
-    const [history, setHistory] = React.useState(Array(9).fill(null));
+    //hooks
+    const [squares, setSquares] = React.useState(Array(9).fill(null));
+    const [history, setHistory] = React.useState([squares]);
     const [xIsNext, setNext] = React.useState(true);
 
-    // passing most recent
-    const current = history[history.length - 1];
-    const [squares, setSquares] = React.useState(current);
-
-    // pass hooks to Board eleme nt
+    // pass hooks to Board element
     const stateProps = {
+        squares: squares,
+        setSquares: setSquares,
         history: history,
         setHistory: setHistory,
         xIsNext: xIsNext,
-        setNext: setNext,
-        squares: squares,
-        setSquares: setSquares
-    };
+        setNext: setNext
+    }
+
+    const handleClick = (props, i) => {
+        console.log(props); //! why this func works without calling props
+        console.log(squares);
+        console.log(props.squares);
+        //! lost here in terms of how and when this func gets called
+
+        // getting most recent from history
+        const current = squares.slice();
+
+        // check if winner or if square is not null
+        if (calculateWinner(current) || current[i]) {
+            return
+        }
+
+        current[i] = xIsNext ? 'X' : 'O';
+        setHistory(history.concat([current]));
+        setNext(!xIsNext);
+        setSquares(current);// set the xIsNext to the opposite Bool value
+    }
 
 
-    const winner = calculateWinner(current);
-    const gameStatus = checkForWinner(winner, stateProps);
-
+    const winner = calculateWinner(squares);
+    const status = checkForWinner(winner, stateProps);
 
     return (
         <div className="game">
             <div className="game-board">
-                <Board {...stateProps} />
+                <Board
+                    squares={squares}
+                    onClick={(props, i) => handleClick(props, i)}
+                />
             </div>
             <div className="game-info">
-                <div>{/* status */}</div>
+                <div className="status">{status}</div>
                 <ol>{/* TODO */}</ol>
             </div>
         </div>
