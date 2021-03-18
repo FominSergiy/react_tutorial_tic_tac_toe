@@ -19,7 +19,7 @@ const Board = (props) => {
         return (
             <Square
                 value={props.squares[i]}
-                onClick={() => props.onClick(props, i)} //! why I don't need to pass props here?
+                onClick={() => props.onClick(i)} //! why I don't need to pass props here?
             />
         );
     }
@@ -51,22 +51,8 @@ const Game = () => {
     const [history, setHistory] = React.useState([squares]);
     const [xIsNext, setNext] = React.useState(true);
 
-    // pass hooks to Board element
-    const stateProps = {
-        squares: squares,
-        setSquares: setSquares,
-        history: history,
-        setHistory: setHistory,
-        xIsNext: xIsNext,
-        setNext: setNext
-    }
 
-    const handleClick = (props, i) => {
-        console.log(props); //! why this func works without calling props
-        console.log(squares);
-        console.log(props.squares);
-        //! lost here in terms of how and when this func gets called
-
+    const handleClick = (i) => {
         // getting most recent from history
         const current = squares.slice();
 
@@ -83,14 +69,14 @@ const Game = () => {
 
 
     const winner = calculateWinner(squares);
-    const status = checkForWinner(winner, stateProps);
+    const status = checkForWinner(winner, xIsNext);
 
     return (
         <div className="game">
             <div className="game-board">
                 <Board
                     squares={squares}
-                    onClick={(props, i) => handleClick(props, i)}
+                    onClick={(i) => handleClick(i)}
                 />
             </div>
             <div className="game-info">
@@ -134,13 +120,13 @@ function calculateWinner(squares) {
     return null;
 }
 
-function checkForWinner(winner, props) {
+function checkForWinner(winner, xIsNext) {
     let status;
 
     if (winner) {
         status = `Winner:${winner}`;
     } else {
-        status = `Next player: ${props.xIsNext ? 'X' : 'O'} `;
+        status = `Next player: ${xIsNext ? 'X' : 'O'} `;
     }
 
     return status;
