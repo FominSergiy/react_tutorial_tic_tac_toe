@@ -49,39 +49,51 @@ const Game = () => {
     //hooks
     const [squares, setSquares] = React.useState(Array(9).fill(null));
     const [history, setHistory] = React.useState([squares]);
-    const [xIsNext, setNext] = React.useState(true);
+    const [xIsNext, setNextX] = React.useState(true);
+    const [step, setStep] = React.useState(0);
 
 
     const handleClick = (i) => {
+        const historyCopy = history.slice(0, step + 1);
         // getting most recent from history
-        const current = squares.slice();
+        const squaresCopy = squares.slice();
 
         // check if winner or if square is not null
-        if (calculateWinner(current) || current[i]) {
+        if (calculateWinner(squaresCopy) || squaresCopy[i]) {
             return
         }
 
-        current[i] = xIsNext ? 'X' : 'O';
-        setHistory(history.concat([current]));
-        setNext(!xIsNext);
-        setSquares(current);// set the xIsNext to the opposite Bool value
+        squaresCopy[i] = xIsNext ? 'X' : 'O';
+
+        setHistory(historyCopy.concat([squaresCopy]));
+        setSquares(squaresCopy);
+        setStep(historyCopy.length);
+        setNextX(!xIsNext);// set the xIsNext to the opposite Bool value
+    }
+
+    const jumpTo = (step) => {
+        setStep(step);
+
+        const isStepNumEven = step % 2 === 0;
+        setNextX(isStepNumEven);
     }
 
 
     const winner = calculateWinner(squares);
     const status = checkForWinner(winner, xIsNext);
+    const moves = getHistoryElementsList(history, jumpTo);
 
     return (
         <div className="game">
             <div className="game-board">
                 <Board
-                    squares={squares}
+                    squares={history[step]}
                     onClick={(i) => handleClick(i)}
                 />
             </div>
             <div className="game-info">
                 <div className="status">{status}</div>
-                <ol>{/* TODO */}</ol>
+                <ol>{moves}</ol>
             </div>
         </div>
     );
@@ -94,9 +106,9 @@ ReactDOM.render(
     document.getElementById('root')
 );
 
-
+// ======= SUPPORTING FUNCTIONS ==========
 function calculateWinner(squares) {
-    console.log('-----------------');
+    // console.log('-----------------');
     const lines = [
         [0, 1, 2],
         [3, 4, 5],
@@ -130,4 +142,26 @@ function checkForWinner(winner, xIsNext) {
     }
 
     return status;
+}
+
+
+function getHistoryElementsList(history, jumpTo) {
+    // step is an array in history with moves in that step
+    // move is the index of that arr inside history parent arr
+    const moves = history.map((step, move) => {
+        const desc = move ?
+            `Go to move #${move}`
+            : 'Go to game start';
+
+        return (
+            // move is an index, and we are adviced not to use it
+            // we can use string of moves as the key
+            <li key={move}>
+                <button onClick={() => jumpTo(move)}>
+                    {desc}
+                </button>
+            </li>
+        )
+    });
+    return moves;
 }
