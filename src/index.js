@@ -80,7 +80,7 @@ const Game = () => {
 
 
     const winner = calculateWinner(squares);
-    const status = checkForWinner(winner, xIsNext);
+    const status = checkForWinner(winner, xIsNext, step);
     const moves = getHistoryElementsList(history, jumpTo);
 
     return (
@@ -128,18 +128,20 @@ function calculateWinner(squares) {
     return null;
 }
 
-function checkForWinner(winner, xIsNext) {
+function checkForWinner(winner, xIsNext, step) {
     let status;
 
     if (winner) {
         status = `Winner:${winner}`;
+    } else if (step === 9) {
+        status = 'Its a Draw!';
     } else {
         status = `Next player: ${xIsNext ? 'X' : 'O'} `;
     }
 
     return status;
-}
 
+}
 
 function getHistoryElementsList(history, jumpTo) {
     // step is an array in history with moves in that step
