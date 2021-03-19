@@ -55,26 +55,26 @@ const Game = () => {
 
     const handleClick = (i) => {
         const historyCopy = history.slice(0, step + 1);
-        // getting most recent from history
-        const squaresCopy = squares.slice();
+        const current = historyCopy[historyCopy.length - 1].slice();
 
         // check if winner or if square is not null
-        if (calculateWinner(squaresCopy) || squaresCopy[i]) {
+        if (calculateWinner(current) || current[i]) {
             return
         }
 
-        squaresCopy[i] = xIsNext ? 'X' : 'O';
+        current[i] = xIsNext ? 'X' : 'O';
 
-        setHistory(historyCopy.concat([squaresCopy]));
-        setSquares(squaresCopy);
+        setSquares(current);
+        setHistory(historyCopy.concat([current]));
         setStep(historyCopy.length);
         setNextX(!xIsNext);// set the xIsNext to the opposite Bool value
     }
 
+
     const jumpTo = (step) => {
         setStep(step);
 
-        const isStepNumEven = step % 2 === 0;
+        const isStepNumEven = (step % 2) === 0;
         setNextX(isStepNumEven);
     }
 
@@ -107,8 +107,8 @@ ReactDOM.render(
 );
 
 // ======= SUPPORTING FUNCTIONS ==========
+
 function calculateWinner(squares) {
-    // console.log('-----------------');
     const lines = [
         [0, 1, 2],
         [3, 4, 5],
@@ -121,10 +121,6 @@ function calculateWinner(squares) {
     ];
     for (let i = 0; i < lines.length; i++) {
         const [a, b, c] = lines[i];
-        // console.log(lines[i]);
-        // console.log(`%c aa ${squares[a] && squares[a]}`, 'color:purple');
-        // console.log(`%c ba ${squares[b] && squares[a]}`, 'color:lightBlue');
-        // console.log(`%c c ${squares[c]}`, 'color:pink');
         if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
             return squares[a];
         }
