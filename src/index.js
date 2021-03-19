@@ -57,7 +57,6 @@ const Game = () => {
         const historyCopy = history.slice(0, step + 1);
         const current = historyCopy[historyCopy.length - 1].slice();
 
-        // console.log(historyCopy.length);
         // check if winner or if square is not null
         if (calculateWinner(current) || current[i]) {
             return
@@ -108,8 +107,8 @@ ReactDOM.render(
 );
 
 // ======= SUPPORTING FUNCTIONS ==========
+
 function calculateWinner(squares) {
-    // console.log('-----------------');
     const lines = [
         [0, 1, 2],
         [3, 4, 5],
@@ -122,10 +121,6 @@ function calculateWinner(squares) {
     ];
     for (let i = 0; i < lines.length; i++) {
         const [a, b, c] = lines[i];
-        // console.log(lines[i]);
-        // console.log(`%c aa ${squares[a] && squares[a]}`, 'color:purple');
-        // console.log(`%c ba ${squares[b] && squares[a]}`, 'color:lightBlue');
-        // console.log(`%c c ${squares[c]}`, 'color:pink');
         if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
             return squares[a];
         }
