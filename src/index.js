@@ -61,6 +61,11 @@ const Game = () => {
     const [history, setHistory] = React.useState([squares]);
     const [xIsNext, setNextX] = React.useState(true);
     const [step, setStep] = React.useState(0);
+    const [sortAsc, setsortAsc] = React.useState(true);
+
+    React.useEffect(() => {
+        sortDOM(sortAsc);
+    }, [sortAsc]);
 
 
     const handleClick = (i) => {
@@ -75,11 +80,12 @@ const Game = () => {
         current[i] = xIsNext ? 'X' : 'O';
 
         setSquares(current);
-        setHistory(historyCopy.concat([current]));
+
+        setHistory(historyCopy.concat([current]))
+
         setStep(historyCopy.length);
         setNextX(!xIsNext);// set the xIsNext to the opposite Bool value
     }
-
 
     const jumpTo = (step) => {
         setStep(step);
@@ -103,11 +109,17 @@ const Game = () => {
                 />
             </div>
             <div className="game-info">
-                <div className="status">{status}</div>
-                <ol>{moves}</ol>
+                <div className="status">
+                    {status}
+                    <button className="sort" onClick={() => setsortAsc(!sortAsc)}>
+                        {'sort'}
+                    </button>
+                </div>
+                <ol id='info-history'>{moves}</ol>
             </div>
         </div>
     );
+
 }
 
 // ========================================
@@ -167,7 +179,7 @@ function getHistoryElementsList(history, jumpTo) {
         return (
             // move is an index, and we are adviced not to use it
             // we can use string of moves as the key
-            <li key={move}>
+            <li key={move} order={move}>
                 <button onClick={() => jumpTo(move)}>
                     {desc}
                 </button>
@@ -175,4 +187,33 @@ function getHistoryElementsList(history, jumpTo) {
         )
     });
     return moves;
+}
+
+function sortDOM(sortAsc) {
+    const list = document.getElementById('info-history');
+
+    const items = list.childNodes;
+    const itemsArr = [...items];
+    console.log(sortAsc);
+    console.log(itemsArr);
+
+
+    if (!sortAsc) {
+        itemsArr.sort((a, b) => {
+            return a.attributes.order.value < b.attributes.order.value
+                ? 1
+                : -1
+        });
+    } else {
+        itemsArr.sort((a, b) => {
+            return a.attributes.order.value < b.attributes.order.value
+                ? -1
+                : 1
+        });
+    }
+
+    for (let i = 0; i < itemsArr.length; ++i) {
+        list.appendChild(itemsArr[i]);
+    }
+
 }

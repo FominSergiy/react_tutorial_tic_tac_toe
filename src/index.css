@@ -37,6 +37,10 @@ body {
     color: #fff;
     border: 1px solid #fff;
   }
+
+  .sort {
+    margin-left: 7px;
+  }
   
   .square:focus {
     outline: none;
