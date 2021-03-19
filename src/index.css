@@ -31,6 +31,12 @@ body {
     text-align: center;
     width: 34px;
   }
+
+  .square-win {
+    background: black;
+    color: #fff;
+    border: 1px solid #fff;
+  }
   
   .square:focus {
     outline: none;

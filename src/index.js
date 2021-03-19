@@ -4,7 +4,9 @@ import './index.css';
 
 const Square = (props) => {
     return (
-        <button className="square" onClick={props.onClick}>
+        <button
+            className={`square ${props.winClass}`}
+            onClick={props.onClick}>
             {props.value}
         </button>
     );
@@ -16,8 +18,16 @@ const Board = (props) => {
     const renderSquare = (props, i) => {
         // where are all arguements stored
         // after this dom element was generated?
+        let winClass;
+
+        if (props.winCombination) {
+            winClass = props.winCombination.includes(i) ?
+                'square-win' : '';
+        }
+
         return (
             <Square
+                winClass={winClass}
                 value={props.squares[i]}
                 onClick={() => props.onClick(i)} //! why I don't need to pass props here?
             />
@@ -89,6 +99,7 @@ const Game = () => {
                 <Board
                     squares={history[step]}
                     onClick={(i) => handleClick(i)}
+                    winCombination={winner ? winner.combination : undefined}
                 />
             </div>
             <div className="game-info">
@@ -122,7 +133,9 @@ function calculateWinner(squares) {
     for (let i = 0; i < lines.length; i++) {
         const [a, b, c] = lines[i];
         if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-            return squares[a];
+
+            // need to return combination to highlight winning squares
+            return { won: squares[a], combination: lines[i] }
         }
     }
     return null;
@@ -132,7 +145,7 @@ function checkForWinner(winner, xIsNext, step) {
     let status;
 
     if (winner) {
-        status = `Winner:${winner}`;
+        status = `Winner:${winner.won}`;
     } else if (step === 9) {
         status = 'Its a Draw!';
     } else {
