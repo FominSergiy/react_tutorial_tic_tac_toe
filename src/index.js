@@ -52,18 +52,11 @@ const Game = () => {
     const [xIsNext, setNextX] = React.useState(true);
     const [step, setStep] = React.useState(0);
 
-    console.log('=====');
-    console.log(history);
-    console.log('=====');
-
-    console.log('++++');
-    console.log(squares);
-    console.log('++++');
 
     const handleClick = (i) => {
         const historyCopy = history.slice(0, step + 1);
         const current = historyCopy[historyCopy.length - 1].slice();
-        console.log(current);
+
         // console.log(historyCopy.length);
         // check if winner or if square is not null
         if (calculateWinner(current) || current[i]) {
@@ -80,9 +73,7 @@ const Game = () => {
 
 
     const jumpTo = (step) => {
-        // console.log(history);
         setStep(step);
-        console.log('step is:' + step);
 
         const isStepNumEven = (step % 2) === 0;
         setNextX(isStepNumEven);
