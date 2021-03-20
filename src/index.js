@@ -27,6 +27,7 @@ const Board = (props) => {
 
         return (
             <Square
+                key={i}
                 winClass={winClass}
                 value={props.squares[i]}
                 onClick={() => props.onClick(i)} //! why I don't need to pass props here?
@@ -34,23 +35,31 @@ const Board = (props) => {
         );
     }
 
+    const generateGrid = (props) => {
+        // using index as keys, which is suboptimal
+        const items = [];
+
+        for (let i = 0; i < 9; i += 3) {
+            const subItems = [];
+
+            for (let j = 0 + i; j < i + 3; j++) {
+
+                subItems.push(renderSquare(props, j));
+            }
+
+            items.push(
+                <div key={i} className="board-row">{subItems}</div>
+            );
+        }
+
+        return items;
+    }
+
+
+    const items = generateGrid(props);
     return (
         <div>
-            <div className="board-row">
-                {renderSquare(props, 0)}
-                {renderSquare(props, 1)}
-                {renderSquare(props, 2)}
-            </div>
-            <div className="board-row">
-                {renderSquare(props, 3)}
-                {renderSquare(props, 4)}
-                {renderSquare(props, 5)}
-            </div>
-            <div className="board-row">
-                {renderSquare(props, 6)}
-                {renderSquare(props, 7)}
-                {renderSquare(props, 8)}
-            </div>
+            {items}
         </div>
     );
 }
@@ -65,10 +74,12 @@ const Game = () => {
 
     React.useEffect(() => {
         sortDOM(sortAsc);
-    }, [sortAsc]);
+    }, [sortAsc, squares]);
 
 
     const handleClick = (i) => {
+
+
         const historyCopy = history.slice(0, step + 1);
         const current = historyCopy[historyCopy.length - 1].slice();
 
@@ -79,10 +90,11 @@ const Game = () => {
 
         current[i] = xIsNext ? 'X' : 'O';
 
+
+        console.log(`%c ${current}`, 'color: blue');
+        console.log(`%c ${historyCopy}`, 'color: purple');
         setSquares(current);
-
         setHistory(historyCopy.concat([current]))
-
         setStep(historyCopy.length);
         setNextX(!xIsNext);// set the xIsNext to the opposite Bool value
     }
@@ -97,7 +109,7 @@ const Game = () => {
 
     const winner = calculateWinner(squares);
     const status = checkForWinner(winner, xIsNext, step);
-    const moves = getHistoryElementsList(history, jumpTo);
+    const moves = getHistoryElementsList(history, jumpTo, sortAsc);
 
     return (
         <div className="game">
@@ -169,8 +181,7 @@ function checkForWinner(winner, xIsNext, step) {
 }
 
 function getHistoryElementsList(history, jumpTo) {
-    // step is an array in history with moves in that step
-    // move is the index of that arr inside history parent arr
+
     const moves = history.map((step, move) => {
         const desc = move ?
             `Go to move #${move}`
@@ -187,6 +198,7 @@ function getHistoryElementsList(history, jumpTo) {
         )
     });
     return moves;
+
 }
 
 function sortDOM(sortAsc) {
@@ -194,8 +206,8 @@ function sortDOM(sortAsc) {
 
     const items = list.childNodes;
     const itemsArr = [...items];
-    console.log(sortAsc);
-    console.log(itemsArr);
+    // console.log(sortAsc);
+    // console.log(itemsArr);
 
 
     if (!sortAsc) {
