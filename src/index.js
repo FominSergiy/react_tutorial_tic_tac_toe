@@ -16,8 +16,6 @@ const Square = (props) => {
 const Board = (props) => {
 
     const renderSquare = (props, i) => {
-        // where are all arguements stored
-        // after this dom element was generated?
         let winClass;
 
         if (props.winCombination) {
@@ -30,7 +28,7 @@ const Board = (props) => {
                 key={i}
                 winClass={winClass}
                 value={props.squares[i]}
-                onClick={() => props.onClick(i)} //! why I don't need to pass props here?
+                onClick={() => props.onClick(i)}
             />
         );
     }
@@ -71,15 +69,15 @@ const Game = () => {
     const [xIsNext, setNextX] = React.useState(true);
     const [step, setStep] = React.useState(0);
     const [sortAsc, setsortAsc] = React.useState(true);
+    const [movesList, setMoves] = React.useState(['start-move']);
 
     React.useEffect(() => {
-        sortDOM(sortAsc);
+        sortDOM(sortAsc, 'info-history');
+        sortDOM(sortAsc, 'moves-history');
     }, [sortAsc, squares]);
 
 
     const handleClick = (i) => {
-
-
         const historyCopy = history.slice(0, step + 1);
         const current = historyCopy[historyCopy.length - 1].slice();
 
@@ -90,13 +88,16 @@ const Game = () => {
 
         current[i] = xIsNext ? 'X' : 'O';
 
+        //setting up move history
+        const moveString = getMoveString(i, xIsNext);
+        const moveListCopy = movesList.slice(0, step + 1);
 
-        console.log(`%c ${current}`, 'color: blue');
-        console.log(`%c ${historyCopy}`, 'color: purple');
+
         setSquares(current);
         setHistory(historyCopy.concat([current]))
         setStep(historyCopy.length);
         setNextX(!xIsNext);// set the xIsNext to the opposite Bool value
+        setMoves(moveListCopy.concat(moveString));
     }
 
     const jumpTo = (step) => {
@@ -110,6 +111,8 @@ const Game = () => {
     const winner = calculateWinner(squares);
     const status = checkForWinner(winner, xIsNext, step);
     const moves = getHistoryElementsList(history, jumpTo, sortAsc);
+    const moveSteps = getMoveElement(movesList);
+
 
     return (
         <div className="game">
@@ -128,6 +131,11 @@ const Game = () => {
                     </button>
                 </div>
                 <ol id='info-history'>{moves}</ol>
+            </div>
+            <div className="game-info moves-history">
+                <ol id='moves-history'>
+                    {moveSteps}
+                </ol>
             </div>
         </div>
     );
@@ -201,14 +209,11 @@ function getHistoryElementsList(history, jumpTo) {
 
 }
 
-function sortDOM(sortAsc) {
-    const list = document.getElementById('info-history');
+function sortDOM(sortAsc, elementId) {
+    const list = document.getElementById(elementId);
 
     const items = list.childNodes;
     const itemsArr = [...items];
-    // console.log(sortAsc);
-    // console.log(itemsArr);
-
 
     if (!sortAsc) {
         itemsArr.sort((a, b) => {
@@ -227,5 +232,54 @@ function sortDOM(sortAsc) {
     for (let i = 0; i < itemsArr.length; ++i) {
         list.appendChild(itemsArr[i]);
     }
+
+}
+
+// move list
+function getMoveString(i, xIsNext) {
+
+    const columns = {
+        1: [0, 3, 6],
+        2: [1, 4, 7],
+        3: [2, 5, 8]
+    }
+
+    const rows = {
+        1: [0, 1, 2],
+        2: [3, 4, 5],
+        3: [6, 7, 8]
+    }
+
+    const whoMoves = xIsNext ? 'X' : 'O';
+    let moveString = `${whoMoves} moved to `;
+    let movePos;
+
+    for (const prop in columns) {
+        if (columns[prop].includes(i)) {
+            movePos = `(col:${prop}, `;
+
+            for (const subProp in rows) {
+                if (rows[subProp].includes(i)) movePos = movePos + `row:${subProp})`;
+
+            }
+        }
+    }
+
+    return moveString + movePos;
+}
+
+
+function getMoveElement(movesList) {
+
+    const stepMoves = movesList.map((moveString, index) => {
+        return (
+            // move is an index, and we are adviced not to use it
+            // we can use string of moves as the key
+            <li key={index} order={index}>
+                {moveString}
+            </li>
+        )
+    });
+    return stepMoves;
 
 }

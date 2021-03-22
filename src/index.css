@@ -58,4 +58,9 @@ body {
   .game-info {
     margin-left: 20px;
   }
+
+  .moves-history {
+    margin-top: 20px;
+    font-size: medium;
+  }
   
