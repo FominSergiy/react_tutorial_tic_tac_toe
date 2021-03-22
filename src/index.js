@@ -16,7 +16,7 @@ const Square = (props) => {
 const Board = (props) => {
 
     const renderSquare = (props, i) => {
-        let winClass;
+        let winClass = '';
 
         if (props.winCombination) {
             winClass = props.winCombination.includes(i) ?
